@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Menupad</title>
+    </head>
+    <body>
+        <form action="/api/regist", method="post">
+            食材: <input type="text" id="regist-ingredient" name="ingredient" required /><br>
+            量: <input type="text" id="ingredient-amount" name="amount" required /><br>
+            <input type="submit" value="追加">
+        </form>
+        <form action="/api/search_menu", method="post">
+            <input type="submit" value="献立検索">
+        </form>
+    </body>
+</html>

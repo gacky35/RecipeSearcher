@@ -1,4 +1,5 @@
 import pandas as pd
+import glob
 from crawl_recipe import Crawler
 
 class Register:
@@ -8,13 +9,14 @@ class Register:
     def regist_ingredient(self, ingredient, amount):
         ingredient = self.Crawler.get_pronunciation([ingredient])
         amount = self.Crawler.replace_to_gram(amount)
-        ingredient_df = pd.read_csv('/api/data/ingredient.csv')
-        if ingredient_df[ingredient]:
-            ingredient_df[ingredient] += amount
+        csv = glob.glob('./api/data/ingredient.csv')
+        if len(csv) > 0:
+            ingredient_df = pd.read_csv('./api/data/ingredient.csv')
         else:
-            ingredient_df[ingredient] = amount
-        ingredient_df.to_csv('/api/data/ingredient.csv', index=False)
-        spice_df = pd.read_csv('/api/data/spice.csv')
-        spice = spice_df['spice'].values
-        if ingredient not in spice:
-            self.Crawler.crawl_recipe(ingredient)
+            ingredient_df = pd.DataFrame()
+        if len(ingredient_df) == 0 or ingredient[0] not in ingredient_df.columns:
+            ingredient_df[ingredient[0]] = [amount]
+        else:
+            ingredient_df[ingredient[0]] += amount
+        ingredient_df.to_csv('./api/data/ingredient.csv', index=False)
+        return ingredient
