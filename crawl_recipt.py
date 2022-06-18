@@ -6,9 +6,12 @@ import os
 import pandas as pd
 from urllib.parse import urljoin
 import re
+import MeCab
+import jaconv
 #%%
 base_url = 'https://www.kurashiru.com'
 crawl_url = "https://kurashiru.com/search?query="
+morpho = MeCab.Tagger()
 #%%
 site = requests.get(crawl_url)
 site.raise_for_status()
@@ -49,6 +52,23 @@ def replace_to_gram(x):
     else:
         return eval(m.groups()[1])
 #%%
+def get_pronunciation(ingredients):
+    pronunciations = []
+    for ingredient in ingredients:
+        morpho_result = morpho.parse(ingredient).splitlines()[:-1]
+        pronunciation = ''
+        for v in morpho_result:
+            if '\t' not in v:
+                continue
+            surface = v.split('\t')[0]
+            p = v.split('\t')[-1].split(',')[-2]
+            if p == '*':
+                p = surface
+            pronunciation += p
+        pronunciations.append(pronunciation)
+    pronunciations = [jaconv.kata2hira(pro) for pro in pronunciations]
+    return pronunciations
+#%%
 def crawl_recipe(ingredient):
     url = crawl_url + ingredient
     site = requests.get(url)
@@ -64,7 +84,11 @@ def crawl_recipe(ingredient):
         ingredients_df = agg_dup_col(ingredients_df)
         recipes = pd.concat([recipes, ingredients_df], ignore_index=True)
         time.sleep(1)
-    return crawl_recipe_sub(page_url_list, recipes.fillna(0))
+    recipes = recipes.fillna(0)
+    normalize_ingreadients = get_pronunciation(recipes.columns.values)
+    recipes = recipes.set_axis(normalize_ingreadients, axis='columns')
+    recipes = agg_dup_col(recipes)
+    return crawl_recipe_sub(page_url_list, recipes)
 #%%
 def crawl_recipe_sub(page_url_list, recipes):
     for page_url in page_url_list:
@@ -77,10 +101,24 @@ def crawl_recipe_sub(page_url_list, recipes):
             ingredients_df = agg_dup_col(ingredients_df)
             recipes = pd.concat([recipes, ingredients_df], ignore_index=True)
             time.sleep(1)
-    return recipes.fillna(0)
+    recipes = recipes.fillna(0)
+    normalize_ingreadients = get_pronunciation(recipes.columns.values)
+    recipes = recipes.set_axis(normalize_ingreadients, axis='columns')
+    recipes = agg_dup_col(recipes)
+    return recipes
 # %%
 start = time.time()
 recipe_df = crawl_recipe("きゅうり")
 display(recipe_df)
 print(time.time() - start)
 # %%
+shokuzai = recipe_df.columns.values
+#%%
+normalize_ingreadients = get_pronunciation(shokuzai)
+#%%
+recipe_df.to_csv('sample_recipe.csv', index=False)
+# %%
+tmp = recipe_df.copy()
+tmp = tmp.set_axis(normalize_ingreadients, axis='columns')
+tmp = agg_dup_col(tmp)
+tmp
