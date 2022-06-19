@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, render_template, make_response, jsonify
 from regist_ingredient import Register
 from .thread import MyThread
 import pandas as pd
@@ -17,4 +17,4 @@ def regist_ingredient():
         t = MyThread(ingredient)
         t.start()
     # 食材が追加された食材を記録
-    return "hoge"
+    return render_template('index.html', message="登録しました")

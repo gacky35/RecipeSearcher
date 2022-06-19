@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, render_template, make_response, jsonify
 from crawl_recipe import Crawler
 from propose_menu import Proposer
 
@@ -18,6 +18,7 @@ def search_recipe():
 
 @search_router.route("/search_menu", methods=["POST"])
 def search_menu():
-    menu = Proposer.solve_knapsack()
-    links = '\n'.join([m for m in menu])
-    return links
+    link = Proposer.solve_knapsack()
+    title = Crawler.get_title(link)
+    menu = [[l, t] for l, t in zip(link, title)]
+    return render_template('search_menu.html', menu=menu)

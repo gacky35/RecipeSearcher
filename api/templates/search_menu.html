@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>献立検索 | Menupad</title>
+    </head>
+    <body>
+        <img src="/img/icon.png" width="120px" height="40px">
+        <ul>
+        {% for i in menu %}
+            <li><a href={{i[0]}}>{{i[1]}}</a></li>
+        {% endfor %}
+        </ul>
+        <form action="/", method="get">
+            <input type="submit" value="戻る">
+        </form>
+    </body>
+</html>

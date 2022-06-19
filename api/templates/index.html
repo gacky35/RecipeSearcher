@@ -4,6 +4,7 @@
         <title>Menupad</title>
     </head>
     <body>
+        <img src="/img/icon.png" width="120px" height="40px">
         <form action="/api/regist", method="post">
             食材: <input type="text" id="regist-ingredient" name="ingredient" required /><br>
             量: <input type="text" id="ingredient-amount" name="amount" required /><br>
@@ -12,5 +13,8 @@
         <form action="/api/search_menu", method="post">
             <input type="submit" value="献立検索">
         </form>
+        {% if message %}
+        <div>{{message}}</div>
+        {% endif %}
     </body>
 </html>
