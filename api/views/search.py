@@ -18,5 +18,6 @@ def search_recipe():
 
 @search_router.route("/search_menu", methods=["POST"])
 def search_menu():
-    menu_df = Proposer.solve_knapsack()
-    return "search menu"
+    menu = Proposer.solve_knapsack()
+    links = '\n'.join([m for m in menu])
+    return links

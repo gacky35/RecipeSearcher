@@ -10,7 +10,7 @@ class Proposer:
         wv = wv.drop(knapsack.columns.values, axis=1)
         wv['sum'] = wv.sum(axis=1)
         tmp = tmp.loc[:, knapsack.columns.values]
-        return tmp.iloc[wv[wv['sum'] == 0].index.values].reset_index()
+        return tmp.iloc[wv[wv['sum'] == 0].index.values]
 
     def solve_knapsack(self):
         knapsack = pd.read_csv('./api/data/ingredient.csv')
@@ -19,12 +19,14 @@ class Proposer:
         wv_ = wv.loc[:, knapsack.columns.values]
         wv = wv.drop('link', axis=1)
         wv = self.extract_recipe(knapsack, wv)
-        wv = wv.drop('index', axis=1)
+        # wv = wv.drop('index', axis=1)
         # W = sum(knapsack.iloc[0].values)
         # dp = [[0] * (W + 1) for _ in range(len(wv)+1)]
         amount = knapsack.iloc[0].values
         p = self.calc_knapsack(0, sum(amount), wv, amount, '')
-        print(p)
+        idx = wv.iloc[[int(i) for i in p[1]]].index.values
+        return recipe.iloc[idx].values
+        # return 'find'
 
         # dp_ks = [[amount] * (W + 1) for _ in range(len(wv)+1)]
         # choice = [[""] * (W + 1) for _ in range(len(wv)+1)]
